@@ -8,5 +8,6 @@ import (
 func main() {
 	bytes,_ := os.ReadFile("../examples/1.lang")
 	code := string(bytes)
-	fmt.Println(code)
+	tokens := Tokenize(code)
+	fmt.Println(tokens[0].Type)
 }

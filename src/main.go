@@ -6,15 +6,18 @@ import (
 )
 
 func main() {
-	bytes,_ := os.ReadFile("../examples/1.lang")
+	bytes, _ := os.ReadFile("../examples/1.lang")
 	code := string(bytes)
-	tokens,err := Tokenize(code)
+	tokens, err := Tokenize(code)
 	if err != nil {
-		fmt.Println(err.Error());
-		return;
+		fmt.Println(err.Error())
+		return
 	}
 	// fmt.Println(tokens)
-	node,_ :=Parse(tokens)
+	node, _ := Parse(tokens)
 	// PrintParseTree(node)
-	fmt.Println(node);
+	Generate(node)
+
+	fmt.Println(node)
 }
+

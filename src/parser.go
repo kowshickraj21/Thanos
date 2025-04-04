@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 type Node interface {
 	Type() string
 }
@@ -19,13 +21,13 @@ func (KeywordNode) Type() string {
 	return "keyword"
 }
 
-type AssignemtNode struct {
+type AssignmentNode struct {
 	Value    string
 	Variable Node
 	Assignee Node
 }
 
-func (AssignemtNode) Type() string {
+func (AssignmentNode) Type() string {
 	return "Assignment"
 }
 
@@ -59,7 +61,7 @@ func (ArithmeticNode) Type() string {
 
 type DeclarationNode struct {
 	DataType string
-	Variable Node
+	Variable IdentifierNode
 }
 
 func (DeclarationNode) Type() string {
@@ -75,12 +77,14 @@ func (SymbolNode) Type() string {
 }
 
 type IntNode struct {
-	Value string
+	Value int
 }
 
 func (IntNode) Type() string {
 	return "Integer"
 }
+
+
 
 func Parse(tokens []Token) (StatementNode, error) {
 	var program StatementNode
@@ -92,7 +96,6 @@ func Parse(tokens []Token) (StatementNode, error) {
 }
 
 func parseStatement(tokens []Token, i int, node *StatementNode) int {
-
 	if tokens[i].Type == "DataType" && tokens[i+1].Type == "Identifier" {
 		var declaration DeclarationNode
 		declaration.DataType = tokens[i].Value
@@ -103,14 +106,14 @@ func parseStatement(tokens []Token, i int, node *StatementNode) int {
 
 		if tokens[i].Value == "=" {
 			i++
-			var assignment AssignemtNode
+			var assignment AssignmentNode
 			assignment.Value = "="
 			assignment.Variable = declaration
 			if tokens[i+1].Value != ";" {
 				assignment.Assignee, _ = parseArithmetic(tokens, i)
 			} else {
 				var int_lit IntNode
-				int_lit.Value = tokens[i].Value
+				int_lit.Value, _ = strconv.Atoi(tokens[i].Value)
 				assignment.Assignee = int_lit
 				i++
 			}
@@ -118,7 +121,7 @@ func parseStatement(tokens []Token, i int, node *StatementNode) int {
 			return i + 1
 		}
 	} else if tokens[i].Type == "Identifier" && tokens[i+1].Type == "Assignment" {
-		var assignment AssignemtNode
+		var assignment AssignmentNode
 		assignment.Value = tokens[i+1].Value
 		var id IdentifierNode
 		id.Value = tokens[i].Value
@@ -129,7 +132,7 @@ func parseStatement(tokens []Token, i int, node *StatementNode) int {
 			assignment.Assignee, _ = parseArithmetic(tokens, i)
 		} else {
 			var int_lit IntNode
-			int_lit.Value = tokens[i].Value
+			int_lit.Value, _ = strconv.Atoi(tokens[i].Value)
 			assignment.Assignee = int_lit
 			i++
 		}
@@ -141,13 +144,13 @@ func parseStatement(tokens []Token, i int, node *StatementNode) int {
 func parseArithmetic(tokens []Token, i int) (Node, error) {
 	if tokens[i+1].Value == ";" {
 		var num IntNode
-		num.Value = tokens[i].Value
+		num.Value, _ = strconv.Atoi(tokens[i].Value)
 		i += 2
 		return num, nil
 	}
 	var node ArithmeticNode
 	var num IntNode
-	num.Value = tokens[i].Value
+	num.Value, _ = strconv.Atoi(tokens[i].Value)
 	node.Value = tokens[i+1].Value
 	node.Var1 = num
 	i += 2
@@ -170,3 +173,4 @@ func parseArithmetic(tokens []Token, i int) (Node, error) {
 // 		KeywordNode(node).Variable
 // 	}
 // }
+
